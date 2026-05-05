@@ -1,91 +1,215 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>KOSYNC | Manajemen Kos Modern</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOSYNC</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+}
+
+/* ===== LEFT HERO ===== */
+.left{
+    flex:1;
+    background:linear-gradient(135deg,#2E1626,#4B1D3F,#6D2E5B);
+    color:white;
+    padding:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.logo{
+    font-weight:700;
+    margin-bottom:30px;
+}
+
+.subtitle{
+    font-size:12px;
+    letter-spacing:2px;
+    opacity:0.7;
+    margin-bottom:10px;
+}
+
+.title{
+    font-size:48px;
+    font-weight:800;
+    margin-bottom:20px;
+}
+
+.title span{
+    color:#E8B86B;
+}
+
+.desc{
+    opacity:0.8;
+    margin-bottom:30px;
+}
+
+.feature{
+    margin-bottom:15px;
+}
+
+/* ===== RIGHT ===== */
+.right{
+    flex:1;
+    background:#f3f3f3;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.card{
+    background:white;
+    width:80%;
+    border-radius:30px;
+    padding:40px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.1);
+}
+
+.card h2{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.card p{
+    text-align:center;
+    font-size:14px;
+    color:#777;
+    margin-bottom:30px;
+}
+
+/* ROLE CARD */
+.role{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px;
+    border-radius:20px;
+    margin-bottom:20px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.role:hover{
+    transform:scale(1.02);
+}
+
+/* OWNER */
+.role.owner{
+    background:linear-gradient(135deg,#4B1D3F,#6D2E5B);
+    color:white;
+}
+
+/* TENANT */
+.role.tenant{
+    background:#eee;
+}
+
+.role-left{
+    display:flex;
+    gap:15px;
+    align-items:center;
+}
+
+.role-icon{
+    font-size:30px;
+}
+
+.role-text h4{
+    font-size:18px;
+}
+
+.role-text p{
+    font-size:13px;
+    margin:0;
+    text-align:left;
+}
+
+.arrow{
+    font-size:20px;
+}
+
+/* FOOTER TEXT */
+.secure{
+    text-align:center;
+    font-size:12px;
+    color:#999;
+    margin-top:20px;
+}
+
+</style>
 </head>
+
 <body>
-    <div class="landing-container">
-        <!-- HERO SECTION -->
-        <div class="hero-section">
-            <div class="hero-bg-layer"></div>
-            <div class="hero-bg-circle circle-1"></div>
-            <div class="hero-bg-circle circle-2"></div>
-            
-            <div class="hero-content">
-                <div class="logo">
-                    <span class="logo-icon">🏠</span>
-                    <h1>KOSYNC</h1>
-                    <span class="logo-badge">MANAGEMENT KOS</span>
-                </div>
-                <p class="hero-subtitle">SISTEM MANAJEMEN KOS MODERN</p>
-                <h2 class="hero-title">Kelola Kos Lebih Mudah & Terstruktur</h2>
-                <p class="hero-desc">Pantau laporan, komunikasi, dan kondisi kos dalam satu platform terintegrasi.</p>
-                
-                <div class="feature-list">
-                    <div class="feature-item">
-                        <div class="feature-icon">📊</div>
-                        <div><strong>Laporan Real-time</strong><p>Pantau laporan secara langsung</p></div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">💬</div>
-                        <div><strong>Komunikasi Mudah</strong><p>Chat langsung dengan penghuni</p></div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">📜</div>
-                        <div><strong>Riwayat Transparan</strong><p>Semua riwayat tersimpan rapi</p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- PILIH ROLE SECTION -->
-        <div class="role-section">
-            <div class="section-label">Selamat Datang!</div>
-            <h3 class="section-title">Pilih peran Anda untuk melanjutkan</h3>
-            
-            <div class="role-cards">
-                <div class="role-card" id="rolePemilik">
-                    <div class="role-icon">👑</div>
-                    <h4>Pemilik Kos</h4>
-                    <p>Kelola properti, kamar, penghuni, laporan, dan semua aktivitas kos.</p>
-                    <div class="role-arrow">→</div>
-                </div>
-                
-                <div class="role-card" id="rolePenghuni">
-                    <div class="role-icon">👤</div>
-                    <h4>Penghuni Kos</h4>
-                    <p>Laporkan masalah, chat dengan pemilik, dan lihat riwayat laporan.</p>
-                    <div class="role-arrow">→</div>
-                </div>
-            </div>
-        </div>
+<!-- LEFT -->
+<div class="left">
+    <div class="logo">🏠 KOSYNC</div>
 
-        <!-- TRUST SECTION -->
-        <div class="trust-section">
-            <div class="stat-number">4.8</div>
-            <div class="stat-star">★★★★★</div>
-            <div class="stat-text">Dipercaya oleh ribuan pemilik kos & penghuni</div>
-            <div class="security-badge">
-                <span>🔒</span>
-                <span>Data Anda aman bersama kami</span>
-                <span>Privasi & keamanan terjamin</span>
-            </div>
-        </div>
+    <div class="subtitle">SISTEM MANAJEMEN KOS MODERN</div>
+
+    <div class="title">
+        Kelola Kos Lebih Mudah <br>
+        <span>& Terstruktur</span>
     </div>
 
-    <script src="script.js"></script>
-    <script>
-        document.getElementById('rolePenghuni').addEventListener('click', function() {
-            window.location.href = 'penghuni kos/beranda.html';
-        });
+    <div class="desc">
+        Pantau laporan, komunikasi, dan kondisi kos dalam satu platform terintegrasi.
+    </div>
 
-        document.getElementById('rolePemilik').addEventListener('click', function() {
-            window.location.href = 'pemilik kos/dashboard.html';
-        });
-    </script>
+    <div class="feature">📊 Laporan Real-time</div>
+    <div class="feature">💬 Komunikasi Mudah</div>
+    <div class="feature">📜 Riwayat Transparan</div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+    <div class="card">
+        <h2>Selamat Datang!</h2>
+        <p>Pilih peran Anda untuk melanjutkan</p>
+
+        <!-- PEMILIK -->
+        <div class="role owner" onclick="location.href='pemilik kos/dashboard.html'">
+            <div class="role-left">
+                <div class="role-icon">👑</div>
+                <div class="role-text">
+                    <h4>Pemilik Kos</h4>
+                    <p>Kelola semua aktivitas kos</p>
+                </div>
+            </div>
+            <div class="arrow">➜</div>
+        </div>
+
+        <!-- PENGHUNI -->
+        <div class="role tenant" onclick="location.href='penghuni kos/beranda.html'">
+            <div class="role-left">
+                <div class="role-icon">🏠</div>
+                <div class="role-text">
+                    <h4>Penghuni Kos</h4>
+                    <p>Laporkan & lihat riwayat</p>
+                </div>
+            </div>
+            <div class="arrow">➜</div>
+        </div>
+
+        <div class="secure">
+            🔒 Data Anda aman • Privasi terjamin
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
