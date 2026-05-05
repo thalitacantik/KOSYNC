@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beranda | KOSYNC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- DRAWER SELALU TERBUKA -->
+        <div class="drawer">
+            <div class="drawer-header">
+                <h3>MENU</h3>
+                <p>Navigasi Cepat</p>
+            </div>
+            <div class="drawer-nav">
+                <div class="drawer-item active" data-page="beranda.html">
+                    <span class="drawer-icon">🏠</span>
+                    <span>Beranda</span>
+                </div>
+                <div class="drawer-item" data-page="laporan-saya.html">
+                    <span class="drawer-icon">📋</span>
+                    <span>Laporan Saya</span>
+                </div>
+                <div class="drawer-item" data-page="pesan.html">
+                    <span class="drawer-icon">💬</span>
+                    <span>Pesan</span>
+                </div>
+                <div class="drawer-item" data-page="riwayat-saya.html">
+                    <span class="drawer-icon">🕓</span>
+                    <span>Riwayat Saya</span>
+                </div>
+                <div class="drawer-item logout" id="logoutBtn">
+                    <span class="drawer-icon">🚪</span>
+                    <span>Keluar</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="greeting-card">
+                <h1>Selamat Datang,</h1>
+                <div class="nama-user">Nama Penghuni Kos</div>
+                <div class="kamar-info">Nomor Kamar (Nama Kos)</div>
+            </div>
+
+            <button class="btn-primary" id="buatLaporanBtn">+ Buat Laporan Kerusakan Baru</button>
+
+            <div class="section-title">Laporan Aktif Saya</div>
+            
+            <div class="report-card">
+                <div class="report-title">Lampu Kamar Mati</div>
+                <div class="report-date">Dilaporkan 2 hari yang lalu</div>
+                <div class="progress-steps">
+                    <div class="step active">● Laporan Diterima</div>
+                    <div class="step active">● Laporan Diproses</div>
+                    <div class="step">● Laporan Selesai</div>
+                </div>
+                <div class="est-time">Estimasi Selesai : Selasa, 04 Mei 2016 (19:00)</div>
+            </div>
+
+            <div class="section-title">Pengumuman Terbaru</div>
+            
+            <div class="announce-card">
+                <div class="announce-text">⚠️ Jangan nyalakan air pada pukul 10.00 s.d. 11.00 karena sedang perbaikan</div>
+            </div>
+            <div class="announce-card">
+                <div class="announce-text">⚡ Terdapat pemadaman lampu serentak pada pukul 16.00 s.d. 17.00</div>
+            </div>
+
+            <div class="footer">
+                <strong>Nama Pemilik Kos</strong>
+                Nama Kos (Nomor Kamar)
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        document.getElementById('buatLaporanBtn')?.addEventListener('click', function() {
+            alert('📝 Form buat laporan kerusakan');
+        });
+    </script>
+</body>
+</html>

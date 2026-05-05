@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistik | KOSYNC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <div class="drawer">
+            <div class="drawer-header">
+                <h3>MENU UTAMA</h3>
+                <p>Panel Pemilik Kos</p>
+            </div>
+            <div class="drawer-nav">
+                <div class="drawer-item" data-page="dashboard.html">
+                    <span class="drawer-icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="drawer-item" data-page="laporan.html">
+                    <span class="drawer-icon">📋</span>
+                    <span>Laporan</span>
+                </div>
+                <div class="drawer-item" data-page="manajemen-kos.html">
+                    <span class="drawer-icon">🏘️</span>
+                    <span>Manajemen Kos</span>
+                </div>
+                <div class="drawer-item" data-page="komunikasi.html">
+                    <span class="drawer-icon">💬</span>
+                    <span>Komunikasi</span>
+                </div>
+                <div class="drawer-item active" data-page="statistik.html">
+                    <span class="drawer-icon">📈</span>
+                    <span>Statistik</span>
+                </div>
+                <div class="drawer-item logout" id="logoutBtn">
+                    <span class="drawer-icon">🚪</span>
+                    <span>Keluar</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="greeting-card">
+                <h1>Statistik & Analitik</h1>
+                <div class="nama-user">Nama Pemilik Kos</div>
+                <div class="kamar-info">Pemilik Kos Sejahtera</div>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-number-large">Rp 4.5JT</div>
+                    <div class="stat-label">Pendapatan Bulan Ini</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number-large">85%</div>
+                    <div class="stat-label">Tingkat Hunian</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number-large">24</div>
+                    <div class="stat-label">Total Laporan</div>
+                </div>
+            </div>
+
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <div class="empty-text">Grafik statistik (dalam pengembangan)</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+</body>
+</html>
