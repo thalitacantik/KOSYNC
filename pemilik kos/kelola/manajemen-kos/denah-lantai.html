@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Denah Lantai | KOSYNC</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --maroon:       #3d1a2e;
+    --cream:        #faf5f0;
+    --cream-card:   #ffffff;
+    --border:       #e8e0d8;
+    --text-main:    #1a1a1a;
+    --text-sub:     #666;
+    --text-muted:   #999;
+    --radius:       14px;
+    --shadow:       0 2px 12px rgba(0,0,0,0.07);
+    --sidebar-w:    260px;
+    --header-h:     64px;
+
+    /* Sidebar */
+    --deep:        #3D1A2E;
+    --blush:       #EDD4D0;
+    --active-sb:   rgba(192,110,140,0.20);
+    --text-nav:    rgba(237,212,208,0.60);
+    --text-hover:  #EDD4D0;
+    --text-active: #FAF4F2;
+    --label-color: rgba(237,212,208,0.38);
+    --divider-sb:  rgba(192,110,140,0.18);
+
+    /* Room states */
+    --room-terisi-bg:    #d9ede0;
+    --room-terisi-txt:   #2e6644;
+    --room-terisi-bdr:   #a8cdb5;
+    --room-kosong-bg:    #ede9e0;
+    --room-kosong-txt:   #857c6a;
+    --room-kosong-bdr:   #cfc7b4;
+    --room-maint-bg:     #f5d9e0;
+    --room-maint-txt:    #8c2040;
+    --room-maint-bdr:    #e0a0b0;
+    --room-notif-bg:     #d6e8f7;
+    --room-notif-txt:    #1b5e99;
+    --room-notif-bdr:    #93c0e6;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-main);
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+
+  /* ══════════════════════════════
+     SIDEBAR
+  ══════════════════════════════ */
+  .sidebar {
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--deep);
+    border-radius: 0 20px 20px 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 400;
+    box-shadow: 4px 0 24px rgba(61,26,46,0.18);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    overflow: hidden;
+  }
+  .sidebar-logo {
+    height: var(--header-h);
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1.5px solid rgba(192,110,140,0.22);
+    flex-shrink: 0;
+  }
+  .logo-img { width: 100%; max-width: 160px; height: 44px; object-fit: contain; }
+  .logo-fallback { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .logo-fallback strong { color: #fff; font-size: 19px; font-weight: 700; letter-spacing: 3px; font-family: 'Poppins', sans-serif; }
+  .logo-fallback span   { color: rgba(237,212,208,0.40); font-size: 9.5px; letter-spacing: 0.4px; }
+
+  .nav-body {
+    flex: 1; padding: 8px 10px;
+    display: flex; flex-direction: column;
+    overflow-y: auto; overflow-x: hidden; min-height: 0;
+  }
+  .nav-body::-webkit-scrollbar { width: 0; }
+  .nav-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.8px;
+    text-transform: uppercase; color: var(--label-color);
+    padding: 12px 10px 5px; display: block;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 8px;
+    color: var(--text-nav); cursor: pointer;
+    font-size: 13.5px; font-weight: 400;
+    transition: background .15s, color .15s;
+    user-select: none; margin-bottom: 1px; text-decoration: none;
+  }
+  .nav-item:hover  { color: var(--text-hover); background: rgba(255,255,255,0.05); }
+  .nav-item.active { color: var(--text-active); background: var(--active-sb); font-weight: 500; }
+  .nav-item-label  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-icon-wrap {
+    width: 26px; height: 26px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .nav-icon-wrap svg {
+    width: 15px; height: 15px; stroke: currentColor; fill: none;
+    stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .nav-sub-wrap { overflow: hidden; max-height: 200px; transition: max-height .25s ease; }
+  .nav-sub-wrap.collapsed { max-height: 0; }
+  .nav-item.sub { padding-left: 46px; font-size: 13px; color: rgba(237,212,208,0.55); }
+  .nav-item.sub:hover  { color: var(--text-hover); background: rgba(255,255,255,0.04); }
+  .nav-item.sub.active { color: var(--text-active); background: rgba(192,110,140,0.16); font-weight: 500; }
+  .nav-chevron {
+    margin-left: auto; width: 13px; height: 13px;
+    stroke: currentColor; fill: none; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+    transition: transform .22s ease; opacity: 0.55; flex-shrink: 0;
+  }
+  .nav-chevron.closed { transform: rotate(-90deg); }
+  .nav-divider { height: 1px; background: var(--divider-sb); margin: 6px 8px; }
+
+  .sidebar-footer {
+    margin: 0 10px 16px; padding: 10px 12px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--divider-sb);
+    border-radius: 10px; display: flex; align-items: center; gap: 10px;
+    cursor: pointer; transition: background .15s; flex-shrink: 0;
+  }
+  .sidebar-footer:hover { background: rgba(255,255,255,0.07); }
+  .footer-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(237,212,208,0.18);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .footer-avatar svg { width: 16px; height: 16px; stroke: rgba(237,212,208,0.65); fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .footer-info { flex: 1; min-width: 0; }
+  .footer-name { color: var(--blush); font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .footer-sub  { color: rgba(237,212,208,0.38); font-size: 10.5px; margin-top: 2px; }
+  .footer-dots { color: rgba(237,212,208,0.38); font-size: 18px; flex-shrink: 0; }
+
+  /* Overlay */
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 350;
+    opacity: 0; transition: opacity 0.25s ease;
+  }
+  .sidebar-overlay.active { display: block; opacity: 1; }
+
+  /* ══════════════════════════════
+     MAIN
+  ══════════════════════════════ */
+  .main {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ══════════════════════════════
+     HEADER
+  ══════════════════════════════ */
+  .kosync-header {
+    background: var(--cream-card);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 28px; height: var(--header-h);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 200; user-select: none; gap: 12px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .hamburger {
+    display: none; width: 36px; height: 36px; border-radius: 8px;
+    background: #f3ece8; border: none; cursor: pointer;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 4.5px; flex-shrink: 0; transition: background .18s;
+  }
+  .hamburger:hover { background: #ecddd5; }
+  .hamburger span { display: block; width: 18px; height: 1.8px; background: var(--maroon); border-radius: 2px; transition: transform 0.22s ease, opacity 0.22s ease; }
+  body.sidebar-open .hamburger span:nth-child(1) { transform: translateY(6.3px) rotate(45deg); }
+  body.sidebar-open .hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  body.sidebar-open .hamburger span:nth-child(3) { transform: translateY(-6.3px) rotate(-45deg); }
+
+  .header-title { font-size: 21px; font-weight: 600; color: #422034; letter-spacing: -0.2px; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .role-badge { border: 1.5px solid #422034; color: #422034; font-size: 12.5px; font-weight: 600; padding: 6px 16px; border-radius: 9px; background: transparent; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+  .icon-btn {
+    position: relative; width: 38px; height: 38px; border-radius: 50%;
+    background: #f3ece8; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .18s; flex-shrink: 0;
+  }
+  .icon-btn:hover { background: #ecddd5; }
+  .icon-btn svg { width: 17px; height: 17px; stroke: #422034; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .notif-indicator { position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; background: #e53935; border-radius: 50%; border: 2px solid var(--cream-card); }
+
+  .notif-wrapper, .profile-wrapper { position: relative; }
+  .notif-panel, .profile-panel {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    background: var(--cream-card); border: 1.5px solid var(--border);
+    border-radius: 16px; box-shadow: 0 8px 32px rgba(66,32,52,0.14);
+    opacity: 0; transform: translateY(-8px) scale(0.98);
+    pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 500;
+  }
+  .notif-panel { width: 360px; overflow: hidden; }
+  .profile-panel { width: 220px; overflow: hidden; }
+  .notif-panel.open, .profile-panel.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+  .np-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+  .np-title { font-size: 15px; font-weight: 700; color: var(--text-main); font-family: 'Poppins', sans-serif; }
+  .np-mark-all { font-size: 11.5px; font-weight: 500; color: #422034; cursor: pointer; background: none; border: none; font-family: 'Poppins', sans-serif; }
+  .np-list { max-height: 340px; overflow-y: auto; }
+  .np-list::-webkit-scrollbar { width: 4px; }
+  .np-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+  .np-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 20px; border-bottom: 1px solid #f5f0ea; cursor: pointer; transition: background .15s; }
+  .np-item:last-child { border-bottom: none; }
+  .np-item:hover { background: #fdf8f5; }
+  .np-item.unread { background: #fdf8f6; }
+  .np-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .np-icon.green  { background: #e8f5e9; } .np-icon.gold { background: #fff8e1; }
+  .np-icon.blue   { background: #e3f2fd; } .np-icon.purple { background: #f3e5f5; }
+  .np-icon.maroon { background: #f5eaee; }
+  .np-icon svg { width: 15px; height: 15px; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .np-icon.green svg { stroke: #2e7d32; } .np-icon.gold svg { stroke: #b08000; }
+  .np-icon.blue svg  { stroke: #1565c0; } .np-icon.purple svg { stroke: #7b1fa2; }
+  .np-icon.maroon svg { stroke: #422034; }
+  .np-body { flex: 1; min-width: 0; }
+  .np-item-title { font-size: 12.5px; font-weight: 600; color: var(--text-main); line-height: 1.35; font-family: 'Poppins', sans-serif; }
+  .np-item-desc  { font-size: 11.5px; color: var(--text-sub); margin-top: 2px; font-family: 'Poppins', sans-serif; }
+  .np-item-time  { font-size: 10.5px; color: var(--text-muted); margin-top: 4px; font-family: 'Poppins', sans-serif; }
+  .np-unread-dot { width: 7px; height: 7px; background: #e53935; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .np-footer { padding: 11px 20px; border-top: 1px solid var(--border); text-align: center; }
+  .np-footer a { font-size: 12.5px; font-weight: 600; color: #422034; text-decoration: none; font-family: 'Poppins', sans-serif; }
+  .pp-info { padding: 14px 16px 11px; border-bottom: 1px solid var(--border); }
+  .pp-name { font-size: 13px; font-weight: 600; color: var(--text-main); font-family: 'Poppins', sans-serif; }
+  .pp-role { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: 'Poppins', sans-serif; }
+  .pp-menu { padding: 5px 0; }
+  .pp-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: var(--text-main); cursor: pointer; font-family: 'Poppins', sans-serif; transition: background .15s; }
+  .pp-item:hover { background: #fdf8f5; }
+  .pp-item svg { width: 14px; height: 14px; stroke: var(--text-sub); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .pp-item.danger { color: #c62828; }
+  .pp-item.danger svg { stroke: #c62828; }
+  .pp-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* ══════════════════════════════
+     CONTENT
+  ══════════════════════════════ */
+  .content { padding: 20px 24px; flex: 1; }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--cream-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .stat-card-title { font-size: 12.5px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; }
+  .stat-card-value { font-size: 38px; font-weight: 800; line-height: 1; color: var(--text-main); font-family: 'Poppins', sans-serif; }
+  .stat-card-value.c-rose   { color: #9D355A; }
+  .stat-card-value.c-forest { color: #323C31; }
+
+  /* ══ Main grid ══ */
+  .floor-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-sub); }
+  .legend-dot {
+    width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0;
+  }
+  .ld-terisi  { background: var(--room-terisi-bg);  border: 1px solid var(--room-terisi-bdr); }
+  .ld-kosong  { background: var(--room-kosong-bg);  border: 1px solid var(--room-kosong-bdr); }
+  .ld-maint   { background: var(--room-maint-bg);   border: 1px solid var(--room-maint-bdr); }
+  .ld-notif   { background: var(--room-notif-bg);   border: 1px solid var(--room-notif-bdr); }
+
+  /* Floor section */
+  .floor-panel {
+    background: var(--cream-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .floor-section {
+    padding: 16px 18px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .floor-section:last-child { border-bottom: none; }
+
+  .floor-title {
+    font-size: 15px; font-weight: 700; color: var(--text-main);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .floor-title::after {
+    content: '';
+    flex: 1; height: 1px; background: var(--border);
+  }
+
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+  }
+
+  /* Room card */
+  .room-card {
+    position: relative;
+    border-radius: 10px;
+    padding: 11px 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s;
+    user-select: none;
+    min-height: 70px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .room-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.10); }
+  .room-card.selected { box-shadow: 0 0 0 2.5px #3d1a2e, 0 4px 16px rgba(61,26,46,0.18); }
+
+  .room-card.terisi {
+    background: var(--room-terisi-bg);
+    border: 1.5px solid var(--room-terisi-bdr);
+  }
+  .room-card.kosong {
+    background: var(--room-kosong-bg);
+    border: 1.5px solid var(--room-kosong-bdr);
+    opacity: 0.82;
+  }
+  .room-card.maintenance {
+    background: var(--room-maint-bg);
+    border: 1.5px solid var(--room-maint-bdr);
+  }
+  .room-card.notif {
+    background: var(--room-notif-bg);
+    border: 1.5px solid var(--room-notif-bdr);
+  }
+
+  .room-number {
+    font-size: 14px; font-weight: 700; line-height: 1.2;
+    font-family: 'Poppins', sans-serif;
+  }
+  .room-card.terisi      .room-number { color: var(--room-terisi-txt); }
+  .room-card.kosong      .room-number { color: var(--room-kosong-txt); }
+  .room-card.maintenance .room-number { color: var(--room-maint-txt); }
+  .room-card.notif       .room-number { color: var(--room-notif-txt); }
+
+  .room-tenant {
+    font-size: 11.5px; margin-top: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .room-card.terisi      .room-tenant { color: var(--room-terisi-txt); opacity: 0.8; }
+  .room-card.kosong      .room-tenant { color: var(--room-kosong-txt); }
+  .room-card.maintenance .room-tenant { color: var(--room-maint-txt); font-weight: 600; }
+  .room-card.notif       .room-tenant { color: var(--room-notif-txt); opacity: 0.8; }
+
+  /* Notif/indicator dot on room card */
+  .room-badge {
+    position: absolute; top: 8px; right: 8px;
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  }
+  .room-card.maintenance .room-badge { background: #b02050; }
+  .room-card.notif       .room-badge { background: #1565c0; }
+
+  /* ══════════════════════════════
+     ROOM DETAIL PANEL (right)
+  ══════════════════════════════ */
+  .detail-panel {
+    background: var(--cream-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+    overflow: hidden;
+  }
+
+  .detail-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .detail-room-name {
+    font-size: 22px; font-weight: 800; color: var(--text-main);
+    font-family: 'Poppins', sans-serif; line-height: 1.1;
+  }
+  .detail-floor { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+  .status-badge {
+    font-size: 11.5px; font-weight: 600; padding: 4px 12px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+  }
+  .sb-terisi  { background: var(--room-terisi-bg); color: var(--room-terisi-txt); border: 1px solid var(--room-terisi-bdr); }
+  .sb-kosong  { background: var(--room-kosong-bg); color: var(--room-kosong-txt); border: 1px solid var(--room-kosong-bdr); }
+  .sb-maint   { background: var(--room-maint-bg);  color: var(--room-maint-txt);  border: 1px solid var(--room-maint-bdr); }
+  .sb-notif   { background: var(--room-notif-bg);  color: var(--room-notif-txt);  border: 1px solid var(--room-notif-bdr); }
+
+  /* Tenant info */
+  .tenant-row {
+    margin: 14px 20px 0;
+    background: #f0f7f2;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .tenant-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #2e6644; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+    font-family: 'Poppins', sans-serif;
+  }
+  .tenant-name  { font-size: 13.5px; font-weight: 700; }
+  .tenant-since { font-size: 11.5px; color: var(--text-sub); margin-top: 1px; }
+
+  /* Room specs */
+  .detail-specs { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid #f5f0ea; font-size: 13px;
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-label { color: var(--text-sub); }
+  .spec-value { font-weight: 600; color: var(--text-main); }
+
+  /* Facilities */
+  .detail-facilities { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .fac-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .fac-tags  { display: flex; flex-wrap: wrap; gap: 7px; }
+  .fac-tag {
+    font-size: 12px; padding: 5px 12px; border-radius: 20px;
+    background: #f0ebe4; border: 1px solid var(--border);
+    color: var(--text-sub); font-weight: 500;
+  }
+
+  /* Action buttons */
+  .detail-actions { padding: 14px 20px; display: flex; gap: 10px; }
+  .btn-outline {
+    flex: 1; padding: 10px; border-radius: 9px;
+    border: 1.5px solid var(--border); background: transparent;
+    font-size: 13px; font-weight: 600; color: var(--text-main);
+    cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: background .15s, border-color .15s;
+  }
+  .btn-outline:hover { background: #f5f0ea; border-color: #ccc; }
+  .btn-solid {
+    flex: 1.4; padding: 10px; border-radius: 9px;
+    border: none; background: #3d1a2e; color: #fff;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: background .15s;
+  }
+  .btn-solid:hover { background: #5a2742; }
+
+  /* Empty state for detail panel */
+  .detail-empty {
+    padding: 40px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    text-align: center;
+  }
+  .detail-empty svg { opacity: 0.2; width: 40px; height: 40px; stroke: var(--text-main); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .detail-empty p { font-size: 13px; color: var(--text-muted); }
+
+  /* ══════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════ */
+  @media (max-width: 1000px) {
+    .floor-grid { grid-template-columns: 1fr; }
+    .detail-panel { position: static; }
+  }
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); }
+    body.sidebar-open .sidebar { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .hamburger { display: flex; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .role-badge { display: none; }
+  }
+  @media (max-width: 520px) {
+    .content { padding: 14px; }
+    .kosync-header { padding: 0 16px; }
+    .rooms-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="kosyncSidebar">
+  <div class="sidebar-logo">
+    <img src="../../assests/img/Group_6-2.png" alt="KOSYNC" class="logo-img"
+      onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+    <div id="logoFallback" class="logo-fallback" style="display:none;">
+      <strong>KOSYNC</strong>
+      <span>Kos Management Platform</span>
+    </div>
+  </div>
+
+  <nav class="nav-body">
+    <span class="nav-label">Utama</span>
+    <a class="nav-item" href="../../utama/dashboard.html">
+      <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></div>
+      <span class="nav-item-label">Dashboard</span>
+    </a>
+    <a class="nav-item" href="../../utama/laporan.html">
+      <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h4M7 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9l-6-6z"/><path d="M13 3v6h6"/></svg></div>
+      <span class="nav-item-label">Laporan</span>
+    </a>
+
+    <div class="nav-divider"></div>
+    <span class="nav-label">Kelola</span>
+
+    <div class="nav-item active" id="manKosToggle" style="cursor:pointer;">
+      <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg></div>
+      <span class="nav-item-label">Manajemen Kos</span>
+      <svg class="nav-chevron" id="manKosChevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="nav-sub-wrap" id="manKosSub">
+      <a class="nav-item sub active" href="denah-lantai.html">
+        <span class="nav-item-label">Denah lantai</span>
+      </a>
+      <a class="nav-item sub" href="daftar-kamar.html">
+        <span class="nav-item-label">Daftar kamar</span>
+      </a>
+    </div>
+
+    <a class="nav-item" href="../komunikasi.html">
+      <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <span class="nav-item-label">Komunikasi</span>
+    </a>
+
+    <div class="nav-divider"></div>
+    <span class="nav-label">Insight</span>
+    <a class="nav-item" href="../../insight/analytics.html">
+      <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+      <span class="nav-item-label">Analytics</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer" id="logoutBtn">
+    <div class="footer-avatar">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+    <div class="footer-info">
+      <div class="footer-name">Nama Pemilik Kos</div>
+      <div class="footer-sub">Nama Kos (Nomor Kamar)</div>
+    </div>
+    <div class="footer-dots">⋮</div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- HEADER -->
+  <header class="kosync-header">
+    <div class="header-left">
+      <button class="hamburger" id="hamburgerBtn">
+        <span></span><span></span><span></span>
+      </button>
+      <h1 class="header-title">Manajemen Kos</h1>
+    </div>
+    <div class="header-actions">
+      <div class="role-badge">Pemilik Kos</div>
+
+      <div class="profile-wrapper" id="profileWrapper">
+        <button class="icon-btn" id="profileBtn">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <div class="profile-panel" id="profilePanel">
+          <div class="pp-info">
+            <div class="pp-name">Nama Pemilik Kos</div>
+            <div class="pp-role">Pemilik Kos · KOSYNC</div>
+          </div>
+          <div class="pp-menu">
+            <div class="pp-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil Saya</div>
+            <div class="pp-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Pengaturan</div>
+            <div class="pp-divider"></div>
+            <div class="pp-item danger" id="profileLogout"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Keluar</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notif-wrapper" id="notifWrapper">
+        <button class="icon-btn" id="notifBtn">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-indicator" id="notifDot"></span>
+        </button>
+        <div class="notif-panel" id="notifPanel">
+          <div class="np-head">
+            <div class="np-title">Notifikasi</div>
+            <button class="np-mark-all" id="markAllBtn">Tandai semua dibaca</button>
+          </div>
+          <div class="np-list">
+            <div class="np-item unread">
+              <div class="np-icon green"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h4M7 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9l-6-6z"/><path d="M13 3v6h6"/></svg></div>
+              <div class="np-body">
+                <div class="np-item-title">Laporan baru dari Kamar 203</div>
+                <div class="np-item-desc">AC tidak dingin, suara berisik.</div>
+                <div class="np-item-time">2 jam lalu</div>
+              </div>
+              <div class="np-unread-dot"></div>
+            </div>
+            <div class="np-item unread">
+              <div class="np-icon gold"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div class="np-body">
+                <div class="np-item-title">Rating baru dari Kamar 101</div>
+                <div class="np-item-desc">Penghuni memberikan rating 5★.</div>
+                <div class="np-item-time">1 jam lalu</div>
+              </div>
+              <div class="np-unread-dot"></div>
+            </div>
+          </div>
+          <div class="np-footer"><a href="#">Lihat semua notifikasi</a></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- Stat Cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-title">Total Kamar</div>
+        <div class="stat-card-value">20</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Terisi</div>
+        <div class="stat-card-value c-forest">17</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Laporan Aktif</div>
+        <div class="stat-card-value c-rose">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Kamar Kosong</div>
+        <div class="stat-card-value">3</div>
+      </div>
+    </div>
+
+    <!-- Main Grid: Floor plan + Detail -->
+    <div class="floor-grid">
+
+      <!-- LEFT: Floor plan -->
+      <div>
+        <!-- Legend -->
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot ld-terisi"></div> Terisi</div>
+          <div class="legend-item"><div class="legend-dot ld-kosong"></div> Kosong</div>
+          <div class="legend-item"><div class="legend-dot ld-maint"></div> Maintenance</div>
+          <div class="legend-item"><div class="legend-dot ld-notif"></div> Ada Laporan</div>
+        </div>
+
+        <div class="floor-panel">
+
+          <!-- Lantai 1 -->
+          <div class="floor-section">
+            <div class="floor-title">Lantai 1</div>
+            <div class="rooms-grid">
+              <div class="room-card terisi" data-room="101">
+                <div class="room-number">101</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card notif" data-room="102">
+                <div class="room-badge"></div>
+                <div class="room-number">102</div>
+                <div class="room-tenant">Sari W.</div>
+              </div>
+              <div class="room-card terisi" data-room="103">
+                <div class="room-number">103</div>
+                <div class="room-tenant">Ahmad R.</div>
+              </div>
+              <div class="room-card kosong" data-room="104">
+                <div class="room-number">104</div>
+                <div class="room-tenant">Kosong</div>
+              </div>
+              <div class="room-card terisi" data-room="105">
+                <div class="room-number">105</div>
+                <div class="room-tenant">Dewi K.</div>
+              </div>
+              <div class="room-card maintenance" data-room="106">
+                <div class="room-badge"></div>
+                <div class="room-number">106</div>
+                <div class="room-tenant">Maintenance</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lantai 2 -->
+          <div class="floor-section">
+            <div class="floor-title">Lantai 2</div>
+            <div class="rooms-grid">
+              <div class="room-card terisi" data-room="201">
+                <div class="room-number">201</div>
+                <div class="room-tenant">Rina A.</div>
+              </div>
+              <div class="room-card terisi" data-room="202">
+                <div class="room-number">202</div>
+                <div class="room-tenant">Fajar M.</div>
+              </div>
+              <div class="room-card notif" data-room="203">
+                <div class="room-badge"></div>
+                <div class="room-number">203</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card terisi" data-room="204">
+                <div class="room-number">204</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card terisi" data-room="205">
+                <div class="room-number">205</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card kosong" data-room="206">
+                <div class="room-number">206</div>
+                <div class="room-tenant">Kosong</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lantai 3 -->
+          <div class="floor-section">
+            <div class="floor-title">Lantai 3</div>
+            <div class="rooms-grid">
+              <div class="room-card terisi" data-room="301">
+                <div class="room-number">301</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card terisi" data-room="302">
+                <div class="room-number">302</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card notif" data-room="303">
+                <div class="room-badge"></div>
+                <div class="room-number">303</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card terisi" data-room="304">
+                <div class="room-number">304</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card terisi" data-room="305">
+                <div class="room-number">305</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card terisi" data-room="306">
+                <div class="room-number">306</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card terisi" data-room="307">
+                <div class="room-number">307</div>
+                <div class="room-tenant">Budi S.</div>
+              </div>
+              <div class="room-card kosong" data-room="308">
+                <div class="room-number">308</div>
+                <div class="room-tenant">Kosong</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /floor-panel -->
+      </div>
+
+      <!-- RIGHT: Detail Panel -->
+      <div class="detail-panel" id="detailPanel">
+        <div class="detail-empty" id="detailEmpty">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+          <p>Klik salah satu kamar<br>untuk melihat detailnya</p>
+        </div>
+        <div id="detailContent" style="display:none;">
+          <div class="detail-header">
+            <div>
+              <div class="detail-room-name" id="dRoomName">Kamar 101</div>
+              <div class="detail-floor" id="dFloor">Lantai 1</div>
+            </div>
+            <div class="status-badge" id="dStatusBadge">Terisi</div>
+          </div>
+
+          <div id="dTenantSection"></div>
+
+          <div class="detail-specs">
+            <div class="spec-row">
+              <span class="spec-label">Harga/bulan</span>
+              <span class="spec-value" id="dPrice">Rp 1.2 jt</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Luas kamar</span>
+              <span class="spec-value" id="dSize">3 × 4 m²</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Tipe Kamar</span>
+              <span class="spec-value" id="dType">Kamar standar</span>
+            </div>
+          </div>
+
+          <div class="detail-facilities">
+            <div class="fac-title">Fasilitas</div>
+            <div class="fac-tags" id="dFacilities"></div>
+          </div>
+
+          <div class="detail-actions" id="dActions"></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── Room data ──
+const roomData = {
+  '101': { name:'Kamar 101', floor:'Lantai 1', status:'terisi', tenant:'Budi S.', since:'Jan 2024', initials:'BS', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'] },
+  '102': { name:'Kamar 102', floor:'Lantai 1', status:'notif',  tenant:'Sari W.', since:'Mar 2023', initials:'SW', price:'Rp 1.4 jt', size:'3 × 4 m²', type:'Kamar deluxe',  facilities:['AC','WiFi','Kamar mandi dalam','TV'], laporan:'Kran bocor di kamar mandi' },
+  '103': { name:'Kamar 103', floor:'Lantai 1', status:'terisi', tenant:'Ahmad R.', since:'Jun 2024', initials:'AR', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '104': { name:'Kamar 104', floor:'Lantai 1', status:'kosong', tenant:null, since:null, initials:null, price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'] },
+  '105': { name:'Kamar 105', floor:'Lantai 1', status:'terisi', tenant:'Dewi K.', since:'Feb 2024', initials:'DK', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '106': { name:'Kamar 106', floor:'Lantai 1', status:'maintenance', tenant:null, since:null, initials:null, price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'], laporan:'Renovasi AC & plafon' },
+  '201': { name:'Kamar 201', floor:'Lantai 2', status:'terisi', tenant:'Rina A.', since:'Apr 2023', initials:'RA', price:'Rp 1.3 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '202': { name:'Kamar 202', floor:'Lantai 2', status:'terisi', tenant:'Fajar M.', since:'Aug 2023', initials:'FM', price:'Rp 1.3 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'] },
+  '203': { name:'Kamar 203', floor:'Lantai 2', status:'notif',  tenant:'Budi S.', since:'May 2022', initials:'BS', price:'Rp 1.5 jt', size:'4 × 4 m²', type:'Kamar premium', facilities:['AC','WiFi','Kamar mandi dalam','TV','Kulkas'], laporan:'AC tidak dingin, suara berisik' },
+  '204': { name:'Kamar 204', floor:'Lantai 2', status:'terisi', tenant:'Budi S.', since:'Jan 2024', initials:'BS', price:'Rp 1.3 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '205': { name:'Kamar 205', floor:'Lantai 2', status:'terisi', tenant:'Budi S.', since:'Mar 2024', initials:'BS', price:'Rp 1.3 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'] },
+  '206': { name:'Kamar 206', floor:'Lantai 2', status:'kosong', tenant:null, since:null, initials:null, price:'Rp 1.3 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '301': { name:'Kamar 301', floor:'Lantai 3', status:'terisi', tenant:'Budi S.', since:'Jul 2023', initials:'BS', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '302': { name:'Kamar 302', floor:'Lantai 3', status:'terisi', tenant:'Budi S.', since:'Nov 2023', initials:'BS', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'] },
+  '303': { name:'Kamar 303', floor:'Lantai 3', status:'notif',  tenant:'Budi S.', since:'Jan 2023', initials:'BS', price:'Rp 1.4 jt', size:'3 × 4 m²', type:'Kamar deluxe',  facilities:['AC','WiFi','Kamar mandi dalam','TV'], laporan:'Pintu tidak bisa dikunci dari dalam' },
+  '304': { name:'Kamar 304', floor:'Lantai 3', status:'terisi', tenant:'Budi S.', since:'Feb 2023', initials:'BS', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '305': { name:'Kamar 305', floor:'Lantai 3', status:'terisi', tenant:'Budi S.', since:'Apr 2024', initials:'BS', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'] },
+  '306': { name:'Kamar 306', floor:'Lantai 3', status:'terisi', tenant:'Budi S.', since:'Jun 2024', initials:'BS', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+  '307': { name:'Kamar 307', floor:'Lantai 3', status:'terisi', tenant:'Budi S.', since:'Sep 2024', initials:'BS', price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi','Kamar mandi dalam'] },
+  '308': { name:'Kamar 308', floor:'Lantai 3', status:'kosong', tenant:null, since:null, initials:null, price:'Rp 1.2 jt', size:'3 × 4 m²', type:'Kamar standar', facilities:['AC','WiFi'] },
+};
+
+const statusLabel = { terisi:'Terisi', kosong:'Kosong', maintenance:'Maintenance', notif:'Ada Laporan' };
+const statusClass = { terisi:'sb-terisi', kosong:'sb-kosong', maintenance:'sb-maint', notif:'sb-notif' };
+
+function showDetail(roomId) {
+  const d = roomData[roomId];
+  if (!d) return;
+
+  document.getElementById('detailEmpty').style.display   = 'none';
+  document.getElementById('detailContent').style.display = 'block';
+
+  document.getElementById('dRoomName').textContent = d.name;
+  document.getElementById('dFloor').textContent    = d.floor;
+  document.getElementById('dPrice').textContent    = d.price;
+  document.getElementById('dSize').textContent     = d.size;
+  document.getElementById('dType').textContent     = d.type;
+
+  const badge = document.getElementById('dStatusBadge');
+  badge.textContent = statusLabel[d.status];
+  badge.className = 'status-badge ' + statusClass[d.status];
+
+  // Tenant section
+  const tenantSec = document.getElementById('dTenantSection');
+  if (d.tenant) {
+    let avatarColor = '#2e6644';
+    if (d.status === 'notif') avatarColor = '#1565c0';
+    tenantSec.innerHTML = `
+      <div class="tenant-row">
+        <div class="tenant-avatar" style="background:${avatarColor}">${d.initials}</div>
+        <div>
+          <div class="tenant-name">${d.tenant}</div>
+          <div class="tenant-since">Sejak ${d.since}</div>
+        </div>
+      </div>
+    `;
+
+    // If has active laporan, show note below avatar row
+    if (d.laporan) {
+      tenantSec.innerHTML += `
+        <div style="margin: 10px 20px 0; padding: 9px 12px; background:${d.status === 'notif' ? '#e8f0fa' : '#fbe8ec'}; border-radius:8px; font-size:12px; color:${d.status === 'notif' ? '#1b5e99' : '#8c2040'}; display:flex; align-items:center; gap:8px;">
+          <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>${d.laporan}</span>
+        </div>
+      `;
+    }
+  } else if (d.status === 'maintenance') {
+    tenantSec.innerHTML = `
+      <div class="tenant-row" style="background:#fce8ec;">
+        <div class="tenant-avatar" style="background:#8c2040;">
+          <svg style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div>
+          <div class="tenant-name" style="color:#8c2040;">Dalam Perbaikan</div>
+          <div class="tenant-since">${d.laporan || 'Sedang direnovasi'}</div>
+        </div>
+      </div>
+    `;
+  } else {
+    tenantSec.innerHTML = `
+      <div class="tenant-row" style="background:#f5f0ea;">
+        <div class="tenant-avatar" style="background:#cfc7b4; font-size:10px; font-weight:700; color:#fff;">
+          <svg style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="tenant-name" style="color:#857c6a;">Tidak ada penghuni</div>
+          <div class="tenant-since">Kamar siap disewa</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Facilities
+  const facContainer = document.getElementById('dFacilities');
+  facContainer.innerHTML = d.facilities.map(f => `<span class="fac-tag">${f}</span>`).join('');
+
+  // Action buttons
+  const actionsEl = document.getElementById('dActions');
+  if (d.status === 'kosong') {
+    actionsEl.innerHTML = `
+      <button class="btn-outline">Edit Kamar</button>
+      <button class="btn-solid">Tambah Penghuni</button>
+    `;
+  } else if (d.status === 'maintenance') {
+    actionsEl.innerHTML = `
+      <button class="btn-outline">Edit Kamar</button>
+      <button class="btn-solid" style="background:#8c2040;">Lihat Laporan</button>
+    `;
+  } else if (d.status === 'notif') {
+    actionsEl.innerHTML = `
+      <button class="btn-outline">Edit Kamar</button>
+      <button class="btn-solid" style="background:#1565c0;">Lihat Laporan</button>
+    `;
+  } else {
+    actionsEl.innerHTML = `
+      <button class="btn-outline">Edit Kamar</button>
+      <button class="btn-solid">Hubungi Penghuni</button>
+    `;
+  }
+}
+
+// Room click handlers
+document.querySelectorAll('.room-card').forEach(card => {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+    this.classList.add('selected');
+    showDetail(this.dataset.room);
+  });
+});
+
+// Auto-select room 101 on load
+document.querySelector('[data-room="101"]').classList.add('selected');
+showDetail('101');
+
+// ── Hamburger ──
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+hamburgerBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.body.classList.toggle('sidebar-open');
+  sidebarOverlay.classList.toggle('active', document.body.classList.contains('sidebar-open'));
+});
+sidebarOverlay.addEventListener('click', () => {
+  document.body.classList.remove('sidebar-open');
+  sidebarOverlay.classList.remove('active');
+});
+
+// ── Accordion ──
+let manKosOpen = true;
+document.getElementById('manKosToggle').addEventListener('click', () => {
+  manKosOpen = !manKosOpen;
+  document.getElementById('manKosSub').classList.toggle('collapsed', !manKosOpen);
+  document.getElementById('manKosChevron').classList.toggle('closed', !manKosOpen);
+});
+
+// ── Logout ──
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  if (confirm('Yakin ingin keluar?')) window.location.href = '../../main.html';
+});
+
+// ── Header dropdowns ──
+const notifBtn = document.getElementById('notifBtn');
+const notifPanel = document.getElementById('notifPanel');
+const profileBtn = document.getElementById('profileBtn');
+const profilePanel = document.getElementById('profilePanel');
+function closeAll() { notifPanel.classList.remove('open'); profilePanel.classList.remove('open'); }
+notifBtn.addEventListener('click', (e) => { e.stopPropagation(); const o = notifPanel.classList.contains('open'); closeAll(); if(!o) notifPanel.classList.add('open'); });
+profileBtn.addEventListener('click', (e) => { e.stopPropagation(); const o = profilePanel.classList.contains('open'); closeAll(); if(!o) profilePanel.classList.add('open'); });
+document.addEventListener('click', closeAll);
+notifPanel.addEventListener('click', e => e.stopPropagation());
+profilePanel.addEventListener('click', e => e.stopPropagation());
+document.getElementById('markAllBtn').addEventListener('click', () => {
+  document.querySelectorAll('.np-item.unread').forEach(i => { i.classList.remove('unread'); i.querySelector('.np-unread-dot')?.remove(); });
+  document.getElementById('notifDot').style.display = 'none';
+});
+document.getElementById('profileLogout').addEventListener('click', () => {
+  if (confirm('Yakin ingin keluar?')) window.location.href = '../../main.html';
+});
+</script>
+</body>
+</html>
